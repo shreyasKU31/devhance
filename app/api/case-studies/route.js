@@ -32,7 +32,7 @@ export async function POST(req) {
 
     // 1. Generate AI Content (includes Repomix & Gemini)
     // This now handles fetching repo data and generating the JSON
-    const content = await generateCaseStudyContent(repoUrl, userId);
+    const { metadata, ...content } = await generateCaseStudyContent(repoUrl, userId);
 
     // 2. Create Slug
     // We can extract name from repoUrl for the slug base
@@ -46,15 +46,20 @@ export async function POST(req) {
         repoUrl,
         title: content.title,
         summary: content.summary,
+        problemSummary: content.problemSummary,
+        solutionSummary: content.solutionSummary,
         techStack: content.techStack,
         architectureOverview: content.architectureOverview,
         coreFeatures: content.coreFeatures,
         challengesAndSolutions: content.challengesAndSolutions,
         impact: content.impact,
-        proofData: content.proofData,
+        proofData: content.proofOfWorkSnapshot || content.proofData || {}, // Map to proofData column with fallback
+        keyFolders: content.keyFolders || [],
+        totalCommits: metadata.commitCount || 0, // From GitHub API
+        activePeriod: metadata.activePeriod || "Unknown", // From GitHub API
         slug,
         user: {
-            connect: { id: dbUser.id } // Connect using the DB ID we just confirmed exists
+            connect: { id: dbUser.id }
         }
       },
     });

@@ -40,13 +40,17 @@ model CaseStudy {
   repoUrl                String
   title                  String
   summary                String
+  problemSummary         String?
+  solutionSummary        String?
   techStack              String
   architectureOverview   String
   coreFeatures           Json
   challengesAndSolutions String
   impact                 String
-  proofData              Json
-  isPublic               Boolean  @default(true)
+  proofData              Json     // Maps to proofOfWorkSnapshot
+  keyFolders             Json?
+  totalCommits           Int?
+  activePeriod           String?
   slug                   String   @unique
   createdAt              DateTime @default(now())
   updatedAt              DateTime @updatedAt

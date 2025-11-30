@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { ArrowLeft, Code, Layers, Lightbulb, TrendingUp, CheckCircle, Github } from "lucide-react";
+import { ArrowLeft, Code, Layers, Lightbulb, TrendingUp, CheckCircle, Github, AlertTriangle } from "lucide-react";
 import { auth } from "@clerk/nextjs/server";
 import { SignedIn, SignedOut, SignInButton } from "@clerk/nextjs";
 
@@ -91,11 +91,31 @@ export default async function CaseStudyPage({ params }) {
           <Separator />
 
           {/* Summary */}
-          <section>
-            <h2 className="text-xl font-semibold mb-3">Project Summary</h2>
-            <p className="text-muted-foreground leading-relaxed">
-              {caseStudy.summary}
-            </p>
+          <section className="grid md:grid-cols-3 gap-6">
+            <div className="md:col-span-3">
+              <h2 className="text-xl font-semibold mb-3">Project Summary</h2>
+              <p className="text-muted-foreground leading-relaxed">
+                {caseStudy.summary}
+              </p>
+            </div>
+            {caseStudy.problemSummary && (
+              <div className="md:col-span-1 bg-muted/20 p-4 rounded-lg border border-border/50">
+                <h3 className="font-semibold mb-2 flex items-center gap-2">
+                  <AlertTriangle className="w-4 h-4 text-orange-500" />
+                  The Problem
+                </h3>
+                <p className="text-sm text-muted-foreground">{caseStudy.problemSummary}</p>
+              </div>
+            )}
+            {caseStudy.solutionSummary && (
+              <div className="md:col-span-2 bg-muted/20 p-4 rounded-lg border border-border/50">
+                <h3 className="font-semibold mb-2 flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-500" />
+                  The Solution
+                </h3>
+                <p className="text-sm text-muted-foreground">{caseStudy.solutionSummary}</p>
+              </div>
+            )}
           </section>
 
           {/* Tech Stack & Architecture */}
@@ -183,17 +203,23 @@ export default async function CaseStudyPage({ params }) {
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
                 <div>
                   <div className="text-2xl font-bold text-primary">
-                    {caseStudy.proofData?.recentCommitSummary?.length || 0}
+                    {caseStudy.totalCommits || caseStudy.proofData?.recentCommitSummary?.length || 0}
                   </div>
-                  <div className="text-xs text-muted-foreground">Recent Commits</div>
+                  <div className="text-xs text-muted-foreground">Total Commits</div>
                 </div>
                 <div>
                   <div className="text-2xl font-bold text-primary">
-                    {caseStudy.proofData?.keyFiles?.length || 0}
+                    {caseStudy.activePeriod || "Unknown"}
                   </div>
-                  <div className="text-xs text-muted-foreground">Key Files</div>
+                  <div className="text-xs text-muted-foreground">Active Period</div>
                 </div>
-                <div className="col-span-2 sm:col-span-2 text-left pl-4 border-l">
+                <div>
+                  <div className="text-2xl font-bold text-primary">
+                    {caseStudy.proofData?.approxLinesOfCode ? `~${caseStudy.proofData.approxLinesOfCode}` : "N/A"}
+                  </div>
+                  <div className="text-xs text-muted-foreground">Lines of Code</div>
+                </div>
+                <div className="col-span-2 sm:col-span-1 text-left pl-4 border-l">
                   <div className="text-xs font-medium mb-1">Top Languages</div>
                   <div className="flex flex-wrap gap-1">
                     {caseStudy.proofData?.mainLanguages ? (
@@ -208,6 +234,22 @@ export default async function CaseStudyPage({ params }) {
                   </div>
                 </div>
               </div>
+
+              {caseStudy.keyFolders && caseStudy.keyFolders.length > 0 && (
+                <>
+                  <Separator className="my-4" />
+                  <div className="text-sm">
+                    <span className="font-medium text-muted-foreground mr-2">Key Folders:</span>
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      {caseStudy.keyFolders.map((folder, idx) => (
+                        <Badge key={idx} variant="outline" className="font-mono text-xs">
+                          {folder}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                </>
+              )}
             </CardContent>
           </Card>
 
