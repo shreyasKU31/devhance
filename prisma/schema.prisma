@@ -1,0 +1,73 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  clerkUserId String   @unique
+  email       String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  caseStudies CaseStudy[]
+  vcReports   VCReport[]
+  payments    Payment[]
+}
+
+model CaseStudy {
+  id                     String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId                 String?  @db.ObjectId
+  user                   User?    @relation(fields: [userId], references: [id])
+  repoUrl                String
+  title                  String
+  summary                String
+  techStack              String
+  architectureOverview   String
+  coreFeatures           Json
+  challengesAndSolutions String
+  impact                 String
+  proofData              Json
+  isPublic               Boolean  @default(true)
+  slug                   String   @unique
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+
+  vcReport VCReport?
+  payments Payment[]
+}
+
+model VCReport {
+  id                String   @id @default(auto()) @map("_id") @db.ObjectId
+  caseStudyId       String   @unique @db.ObjectId
+  caseStudy         CaseStudy @relation(fields: [caseStudyId], references: [id])
+  userId            String   @db.ObjectId
+  user              User     @relation(fields: [userId], references: [id])
+  scores            Json
+  narrativeSections Json
+  verdict           String
+  createdAt         DateTime @default(now())
+
+  payment Payment?
+}
+
+model Payment {
+  id                       String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId                   String   @db.ObjectId
+  user                     User     @relation(fields: [userId], references: [id])
+  caseStudyId              String   @db.ObjectId
+  caseStudy                CaseStudy @relation(fields: [caseStudyId], references: [id])
+  vcReportId               String?  @unique @db.ObjectId
+  vcReport                 VCReport? @relation(fields: [vcReportId], references: [id])
+  lemonSqueezyOrderId      String
+  lemonSqueezyCheckoutId   String?
+  amount                   Int
+  currency                 String
+  status                   String
+  createdAt                DateTime @default(now())
+  updatedAt                DateTime @updatedAt
+}
