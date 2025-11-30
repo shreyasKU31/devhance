@@ -60,55 +60,52 @@ export default async function VCReportPage({ params }) {
         <div className="grid gap-6 md:grid-cols-2">
           <Card className="border-primary/20 bg-primary/5">
             <CardHeader>
-              <CardTitle>Overall Readiness</CardTitle>
+              <CardTitle>Overall Potential</CardTitle>
             </CardHeader>
             <CardContent className="flex items-center justify-center py-6">
               <div className="relative flex items-center justify-center w-32 h-32 rounded-full border-8 border-primary/30">
-                <span className="text-4xl font-bold text-primary">{scores.overallScore}</span>
+                <span className="text-4xl font-bold text-primary">{scores.overallStartupPotential}</span>
               </div>
             </CardContent>
           </Card>
 
           <div className="space-y-4">
+            <ScoreRow label="Problem Clarity" score={scores.problemClarity} />
+            <ScoreRow label="Solution Strength" score={scores.solutionStrength} />
             <ScoreRow label="Market Potential" score={scores.marketPotential} />
             <ScoreRow label="Technical Quality" score={scores.technicalQuality} />
-            <ScoreRow label="Execution Risk" score={scores.executionRisk} inverse />
+            <ScoreRow label="Traction / Readiness" score={scores.tractionReadiness} />
             <ScoreRow label="Defensibility" score={scores.defensibility} />
+            <ScoreRow label="Execution Risk" score={scores.executionRisk} inverse />
           </div>
         </div>
 
         {/* Narrative Sections */}
         <div className="grid gap-6 md:grid-cols-2">
-          <SectionCard title="Problem & Market" icon={Target}>
-             <p className="font-semibold mb-2">Problem:</p>
-             <p className="text-sm text-muted-foreground mb-4">{narrativeSections.problem}</p>
-             <p className="font-semibold mb-2">Market:</p>
-             <p className="text-sm text-muted-foreground">{narrativeSections.market}</p>
+          <SectionCard title="Problem & Solution" icon={Target}>
+             <p className="font-semibold mb-2">Problem & User Pain:</p>
+             <p className="text-sm text-muted-foreground mb-4">{narrativeSections.problemAndUserPain}</p>
+             <p className="font-semibold mb-2">Solution & Product:</p>
+             <p className="text-sm text-muted-foreground">{narrativeSections.solutionAndProduct}</p>
           </SectionCard>
 
-          <SectionCard title="Solution & Tech" icon={CheckCircle}>
-             <p className="font-semibold mb-2">Solution:</p>
-             <p className="text-sm text-muted-foreground mb-4">{narrativeSections.solution}</p>
-             <p className="font-semibold mb-2">Technical Assessment:</p>
-             <p className="text-sm text-muted-foreground">{narrativeSections.technicalAssessment}</p>
+          <SectionCard title="Market & Tech" icon={CheckCircle}>
+             <p className="font-semibold mb-2">Market & Competition:</p>
+             <p className="text-sm text-muted-foreground mb-4">{narrativeSections.marketAndCompetition}</p>
+             <p className="font-semibold mb-2">Technology & Architecture:</p>
+             <p className="text-sm text-muted-foreground">{narrativeSections.technologyAndArchitecture}</p>
           </SectionCard>
 
-          <SectionCard title="Risks & Moat" icon={AlertTriangle}>
-             <p className="font-semibold mb-2">Risks:</p>
-             <p className="text-sm text-muted-foreground mb-4">{narrativeSections.risks}</p>
-             <p className="font-semibold mb-2">Differentiation:</p>
-             <p className="text-sm text-muted-foreground">{narrativeSections.differentiation}</p>
+          <SectionCard title="Traction & Risks" icon={AlertTriangle}>
+             <p className="font-semibold mb-2">Traction & Validation:</p>
+             <p className="text-sm text-muted-foreground mb-4">{narrativeSections.tractionAndValidation}</p>
+             <p className="font-semibold mb-2">Risks & Gaps:</p>
+             <p className="text-sm text-muted-foreground">{narrativeSections.risksAndGaps}</p>
           </SectionCard>
 
-          <SectionCard title="Strategy" icon={Shield}>
-             <p className="font-semibold mb-2">Monetization:</p>
-             <p className="text-sm text-muted-foreground mb-4">{narrativeSections.monetization}</p>
-             <p className="font-semibold mb-2">Recommendations:</p>
-             <ul className="list-disc pl-5 text-sm text-muted-foreground space-y-1">
-               {narrativeSections.recommendations.map((rec, i) => (
-                 <li key={i}>{rec}</li>
-               ))}
-             </ul>
+          <SectionCard title="Growth & Next Steps" icon={Shield}>
+             <p className="font-semibold mb-2">Growth Path:</p>
+             <p className="text-sm text-muted-foreground">{narrativeSections.growthPathAndNextSteps}</p>
           </SectionCard>
         </div>
       </div>

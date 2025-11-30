@@ -1,80 +1,63 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Github, Loader2 } from "lucide-react";
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 export default function NewCaseStudyPage() {
-  const [url, setUrl] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [status, setStatus] = useState("Initializing...");
   const router = useRouter();
+  const searchParams = useSearchParams();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!url.includes("github.com")) {
-      toast.error("Please enter a valid GitHub URL");
-      return;
+  useEffect(() => {
+    const repoParam = searchParams.get("repo");
+    if (repoParam) {
+      handleAutoSubmit(repoParam);
+    } else {
+      // If no repo param, redirect back to home
+      router.push("/");
     }
+  }, [searchParams]);
 
-    setLoading(true);
+  const handleAutoSubmit = async (repoUrl) => {
+    setStatus("Analyzing Repository...");
     try {
       const res = await fetch("/api/case-studies", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ repoUrl: url }),
+        body: JSON.stringify({ repoUrl }),
       });
 
-      if (!res.ok) throw new Error("Failed to generate case study");
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || "Failed to generate case study");
+      }
 
       const data = await res.json();
+      setStatus("Finalizing...");
       toast.success("Case study generated!");
       router.push(`/case-studies/${data.slug}`);
     } catch (error) {
       console.error(error);
-      toast.error("Something went wrong. Please try again.");
-    } finally {
-      setLoading(false);
+      toast.error(error.message || "Something went wrong. Please try again.");
+      // On error, redirect to home after a delay so user sees the toast
+      setTimeout(() => router.push("/"), 2000);
     }
   };
 
   return (
-    <div className="flex items-center justify-center min-h-[calc(100vh-4rem)] bg-muted/30 p-4">
-      <Card className="w-full max-w-md border-primary/20 shadow-lg">
-        <CardHeader>
-          <CardTitle className="text-2xl text-center">New Case Study</CardTitle>
-          <CardDescription className="text-center">
-            Paste a GitHub repository URL to generate a professional case study.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="relative">
-              <Github className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="https://github.com/username/repo"
-                className="pl-9"
-                value={url}
-                onChange={(e) => setUrl(e.target.value)}
-                required
-              />
-            </div>
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Analyzing Repo...
-                </>
-              ) : (
-                "Generate Case Study"
-              )}
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
+    <div className="flex flex-col items-center justify-center min-h-[calc(100vh-4rem)] bg-background p-4">
+      <div className="flex flex-col items-center gap-4 text-center animate-in fade-in zoom-in duration-500">
+        <div className="relative">
+          <div className="absolute inset-0 bg-primary/20 blur-xl rounded-full animate-pulse" />
+          <Loader2 className="h-12 w-12 animate-spin text-primary relative z-10" />
+        </div>
+        <h2 className="text-2xl font-bold tracking-tight">{status}</h2>
+        <p className="text-muted-foreground max-w-sm">
+          We are fetching the repository, analyzing the code with AI, and generating your case study. This may take a few seconds.
+        </p>
+      </div>
     </div>
   );
 }

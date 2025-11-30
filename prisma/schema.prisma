@@ -19,6 +19,20 @@ model User {
   payments    Payment[]
 }
 
+model RepoData {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  repoUrl       String   @unique
+  owner         String
+  name          String
+  description   String?
+  stars         Int
+  language      String?
+  defaultBranch String
+  contextText   String   // Compressed repo text
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
 model CaseStudy {
   id                     String   @id @default(auto()) @map("_id") @db.ObjectId
   userId                 String?  @db.ObjectId

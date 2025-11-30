@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowRight, FileText, TrendingUp, Github } from "lucide-react";
+import HeroForm from "@/components/hero-form";
 
 export default function Home() {
   return (
@@ -44,33 +45,11 @@ export default function Home() {
                 Get a VC-grade investment report for just $5.
               </p>
             </div>
-            <div className="space-y-4 mt-8">
-              <SignedOut>
-                <div className="flex flex-col items-center gap-4">
-                  <p className="text-muted-foreground">Sign in to generate your first case study.</p>
-                  <div className="flex gap-4">
-                    <SignInButton mode="modal">
-                      <Button size="lg" className="font-semibold text-lg px-8 py-6 h-auto">
-                        Sign In to Start
-                      </Button>
-                    </SignInButton>
-                    <Link href="/case-studies/example">
-                      <Button variant="outline" size="lg" className="font-semibold text-lg px-8 py-6 h-auto">
-                        View Example
-                      </Button>
-                    </Link>
-                  </div>
-                </div>
-              </SignedOut>
-              <SignedIn>
-                <Link href="/case-studies/new">
-                  <Button size="lg" className="font-semibold text-lg px-8 py-6 h-auto">
-                    <Github className="mr-2 w-5 h-5" />
-                    Paste GitHub Repo
-                  </Button>
-                </Link>
-              </SignedIn>
-            </div>
+            <HeroForm />
+            
+            <p className="text-xs text-muted-foreground mt-8">
+              No credit card required for free case studies.
+            </p>
           </div>
         </section>
 

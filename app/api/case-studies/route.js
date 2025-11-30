@@ -1,14 +1,14 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { getRepoMetadata, getRepoLanguages } from "@/lib/github";
 import { generateCaseStudyContent } from "@/lib/ai";
-import { auth } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 
 export async function POST(req) {
   try {
     const { userId } = await auth();
+    const user = await currentUser();
     
-    if (!userId) {
+    if (!userId || !user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -18,20 +18,29 @@ export async function POST(req) {
       return NextResponse.json({ error: "Repo URL is required" }, { status: 400 });
     }
 
-    // 1. Fetch GitHub Data
-    const [repoMeta, languages] = await Promise.all([
-      getRepoMetadata(repoUrl),
-      getRepoLanguages(repoUrl),
-    ]);
+    // Ensure User exists in DB (Sync on demand if webhook failed)
+    // Use upsert to handle race conditions where webhook might create user in parallel
+    const email = user.emailAddresses[0]?.emailAddress || "no-email@example.com";
+    const dbUser = await prisma.user.upsert({
+      where: { clerkUserId: userId },
+      update: {}, // No updates if exists
+      create: {
+        clerkUserId: userId,
+        email: email,
+      },
+    });
 
-    // 2. Generate AI Content
-    const content = await generateCaseStudyContent(repoMeta, languages);
+    // 1. Generate AI Content (includes Repomix & Gemini)
+    // This now handles fetching repo data and generating the JSON
+    const content = await generateCaseStudyContent(repoUrl, userId);
 
-    // 3. Create Slug
-    const slugBase = repoMeta.name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+    // 2. Create Slug
+    // We can extract name from repoUrl for the slug base
+    const repoName = repoUrl.split("/").pop() || "project";
+    const slugBase = repoName.toLowerCase().replace(/[^a-z0-9]+/g, "-");
     const slug = `${slugBase}-${Date.now().toString().slice(-4)}`;
 
-    // 4. Save to DB
+    // 3. Save to DB
     const caseStudy = await prisma.caseStudy.create({
       data: {
         repoUrl,
@@ -44,12 +53,8 @@ export async function POST(req) {
         impact: content.impact,
         proofData: content.proofData,
         slug,
-        // If user is logged in, link it. We need to find/create the User record first.
-        // For simplicity in this demo, we only link if we have a User record.
-        // In a real app, we'd sync Clerk users to our DB via webhook.
-        // Here we'll skip linking if user not in DB, or try to find by clerkUserId.
         user: {
-            connect: { clerkUserId: userId }
+            connect: { id: dbUser.id } // Connect using the DB ID we just confirmed exists
         }
       },
     });
