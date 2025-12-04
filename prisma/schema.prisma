@@ -81,11 +81,11 @@ model Payment {
   caseStudy                CaseStudy @relation(fields: [caseStudyId], references: [id])
   vcReportId               String?  @unique @db.ObjectId
   vcReport                 VCReport? @relation(fields: [vcReportId], references: [id])
-  lemonSqueezyOrderId      String
+  lemonSqueezyOrderId      String?  @unique
   lemonSqueezyCheckoutId   String?
-  amount                   Int
-  currency                 String
-  status                   String
+  amount                   Int?
+  currency                 String   @default("USD")
+  status                   String   @default("pending") // pending, paid, failed, refunded
   createdAt                DateTime @default(now())
   updatedAt                DateTime @updatedAt
 }

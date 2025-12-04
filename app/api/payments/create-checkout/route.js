@@ -1,16 +1,28 @@
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
-import { lemonSqueezyApiInstance } from "@lemonsqueezy/lemonsqueezy.js";
+import { lemonSqueezySetup, createCheckout } from "@lemonsqueezy/lemonsqueezy.js";
 import prisma from "@/lib/prisma";
+
+// Configure Lemon Squeezy
+const apiKey = process.env.LEMON_SQUEEZY_API_KEY;
+if (!apiKey) {
+  console.error("LEMON_SQUEEZY_API_KEY missing");
+}
+if (apiKey) {
+  lemonSqueezySetup({ apiKey });
+}
 
 export async function POST(req) {
   try {
     const { userId } = await auth();
     if (!userId) {
-      return NextResponse.redirect(new URL("/sign-in", req.url));
+      return NextResponse.json(
+        { error: "Unauthorized. Please sign in." },
+        { status: 401 }
+      );
     }
 
-    // Parse form data or JSON
+    // Parse request body
     let caseStudyId;
     const contentType = req.headers.get("content-type");
     if (contentType?.includes("application/json")) {
@@ -22,7 +34,10 @@ export async function POST(req) {
     }
 
     if (!caseStudyId) {
-      return NextResponse.json({ error: "Case Study ID required" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Case Study ID required" },
+        { status: 400 }
+      );
     }
 
     // Get User from DB
@@ -34,80 +49,157 @@ export async function POST(req) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    // Check if report already exists
+    // Check if VC report already exists
     const existingReport = await prisma.vCReport.findUnique({
       where: { caseStudyId },
     });
 
     if (existingReport) {
-      return NextResponse.redirect(new URL(`/vc-reports/${existingReport.id}`, req.url));
+      // Report already generated, redirect to it
+      return NextResponse.json({
+        success: true,
+        redirectUrl: `/vc-reports/${existingReport.id}`,
+        message: "Report already exists"
+      });
     }
 
-    // Create Checkout
-    // Ideally, store STORE_ID and VARIANT_ID in env vars
+    // Fetch case study
+    const caseStudy = await prisma.caseStudy.findUnique({
+      where: { id: caseStudyId },
+      select: { slug: true, title: true },
+    });
+
+    if (!caseStudy) {
+      return NextResponse.json(
+        { error: "Case Study not found" },
+        { status: 404 }
+      );
+    }
+
+    // Check for existing pending/paid payment
+    const existingPayment = await prisma.payment.findFirst({
+      where: {
+        userId: user.id,
+        caseStudyId,
+        status: { in: ["pending", "paid"] }
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+
+    if (existingPayment && existingPayment.status === "paid") {
+      return NextResponse.json({
+        success: true,
+        message: "Payment already completed. Report is being generated.",
+        status: "processing"
+      });
+    }
+
+    // Lemon Squeezy environment variables
     const storeId = process.env.LEMON_SQUEEZY_STORE_ID;
     const variantId = process.env.LEMON_SQUEEZY_VARIANT_ID;
 
-    if (!storeId || !variantId) {
-      console.error("Lemon Squeezy env vars missing");
-      return NextResponse.json({ error: "Configuration error" }, { status: 500 });
+    if (!storeId || !variantId || !apiKey) {
+      console.error("Lemon Squeezy env vars missing", {
+        hasApiKey: !!apiKey,
+        storeId,
+        variantId,
+      });
+      return NextResponse.json(
+        { error: "Payment configuration error. Please contact support." },
+        { status: 500 }
+      );
     }
 
-    // We use the raw API or the SDK. The SDK setup might need global config.
-    // For simplicity in this demo, we'll use a fetch wrapper or the SDK if configured.
-    // Let's assume standard fetch for maximum control if SDK setup is complex.
-    
-    const checkoutPayload = {
-      data: {
-        type: "checkouts",
-        attributes: {
-          checkout_data: {
-            custom: {
-              user_id: user.id,
-              case_study_id: caseStudyId,
-            },
-          },
-        },
-        relationships: {
-          store: {
-            data: {
-              type: "stores",
-              id: storeId.toString(),
-            },
-          },
-          variant: {
-            data: {
-              type: "variants",
-              id: variantId.toString(),
-            },
-          },
-        },
-      },
-    };
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+    const successUrl = `${appUrl}/case-studies/${caseStudy.slug}?payment=success`;
 
-    const response = await fetch("https://api.lemonsqueezy.com/v1/checkouts", {
-      method: "POST",
-      headers: {
-        Accept: "application/vnd.api+json",
-        "Content-Type": "application/vnd.api+json",
-        Authorization: `Bearer ${process.env.LEMON_SQUEEZY_API_KEY}`,
-      },
-      body: JSON.stringify(checkoutPayload),
+    console.log("Creating checkout for:", {
+      userId: user.id,
+      caseStudyId,
+      email: user.email,
     });
 
-    if (!response.ok) {
-      const error = await response.json();
-      console.error("Lemon Squeezy Checkout Error:", error);
-      return NextResponse.json({ error: "Failed to create checkout" }, { status: 500 });
+    // Create Lemon Squeezy checkout
+    const checkout = await createCheckout(
+      parseInt(storeId, 10),
+      parseInt(variantId, 10),
+      {
+        checkoutData: {
+          email: user.email,
+          custom: {
+            user_id: user.id,
+            case_study_id: caseStudyId,
+          },
+        },
+        checkoutOptions: {
+          embed: false,
+          media: false,
+          logo: true,
+        },
+        productOptions: {
+          name: `VC Report: ${caseStudy.title}`,
+          description: "AI-generated VC investment analysis report",
+          redirectUrl: successUrl,
+          receiptButtonText: "View Report",
+          receiptLinkUrl: successUrl,
+          receiptThankYouNote: "Your report is being generated and will be ready shortly!",
+        },
+      }
+    );
+
+    if (checkout.error) {
+      console.error("Lemon Squeezy returned error:", checkout.error);
+      return NextResponse.json(
+        { error: "Failed to create checkout session" },
+        { status: 500 }
+      );
     }
 
-    const data = await response.json();
-    const checkoutUrl = data.data.attributes.url;
+    const checkoutUrl = checkout.data?.data?.attributes?.url;
+    if (!checkoutUrl) {
+      console.error("No checkout URL in response:", checkout);
+      return NextResponse.json(
+        { error: "Failed to create checkout session" },
+        { status: 500 }
+      );
+    }
 
-    return NextResponse.redirect(checkoutUrl);
+    // Create or update pending payment record
+    if (existingPayment && existingPayment.status === "pending") {
+      await prisma.payment.update({
+        where: { id: existingPayment.id },
+        data: {
+          lemonSqueezyCheckoutId: checkout.data.data.id,
+          updatedAt: new Date(),
+        },
+      });
+    } else {
+      await prisma.payment.create({
+        data: {
+          userId: user.id,
+          caseStudyId,
+          status: "pending",
+          lemonSqueezyCheckoutId: checkout.data.data.id,
+        },
+      });
+    }
 
+    return NextResponse.json({
+      success: true,
+      checkoutUrl,
+    });
   } catch (error) {
     console.error("Checkout creation error:", error);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    if (error.errors) {
+      console.error(
+        "Lemon Squeezy Validation Errors:",
+        JSON.stringify(error.errors, null, 2)
+      );
+    }
+    const errorMessage = error.message || "Internal Server Error";
+    return NextResponse.json(
+      { error: errorMessage },
+      { status: 500 }
+    );
   }
 }

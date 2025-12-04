@@ -39,6 +39,26 @@ export default async function VCReportPage({ params }) {
 
   const { scores, narrativeSections, verdict } = report;
 
+  // Calculate dynamic average
+  // Standard scores (Higher is better)
+  const standardMetrics = [
+    scores.problemClarity,
+    scores.solutionStrength,
+    scores.marketPotential,
+    scores.technicalQuality,
+    scores.tractionReadiness,
+    scores.defensibility
+  ];
+
+  let totalPoints = standardMetrics.reduce((sum, metric) => sum + (metric?.score || 0), 0);
+
+  // Execution Risk (Lower is better, so for potential: 10 - risk)
+  const riskScore = scores.executionRisk?.score || 0;
+  totalPoints += (10 - riskScore);
+
+  // Average over 7 metrics
+  const averageScore = (totalPoints / 7).toFixed(1);
+
   return (
     <div className="min-h-screen bg-background p-6 md:p-12">
       <div className="max-w-4xl mx-auto space-y-8">
@@ -62,21 +82,24 @@ export default async function VCReportPage({ params }) {
             <CardHeader>
               <CardTitle>Overall Potential</CardTitle>
             </CardHeader>
-            <CardContent className="flex items-center justify-center py-6">
+            <CardContent className="flex flex-col items-center justify-center py-6 gap-4">
               <div className="relative flex items-center justify-center w-32 h-32 rounded-full border-8 border-primary/30">
-                <span className="text-4xl font-bold text-primary">{scores.overallStartupPotential}</span>
+                <span className="text-4xl font-bold text-primary">{averageScore}</span>
               </div>
+              <p className="text-center text-sm text-muted-foreground px-4">
+                {scores.overallStartupPotential?.reason}
+              </p>
             </CardContent>
           </Card>
 
           <div className="space-y-4">
-            <ScoreRow label="Problem Clarity" score={scores.problemClarity} />
-            <ScoreRow label="Solution Strength" score={scores.solutionStrength} />
-            <ScoreRow label="Market Potential" score={scores.marketPotential} />
-            <ScoreRow label="Technical Quality" score={scores.technicalQuality} />
-            <ScoreRow label="Traction / Readiness" score={scores.tractionReadiness} />
-            <ScoreRow label="Defensibility" score={scores.defensibility} />
-            <ScoreRow label="Execution Risk" score={scores.executionRisk} inverse />
+            <ScoreRow label="Problem Clarity" data={scores.problemClarity} />
+            <ScoreRow label="Solution Strength" data={scores.solutionStrength} />
+            <ScoreRow label="Market Potential" data={scores.marketPotential} />
+            <ScoreRow label="Technical Quality" data={scores.technicalQuality} />
+            <ScoreRow label="Traction / Readiness" data={scores.tractionReadiness} />
+            <ScoreRow label="Defensibility" data={scores.defensibility} />
+            <ScoreRow label="Execution Risk" data={scores.executionRisk} inverse />
           </div>
         </div>
 
@@ -113,15 +136,18 @@ export default async function VCReportPage({ params }) {
   );
 }
 
-function ScoreRow({ label, score, inverse }) {
-  // For inverse (Risk), lower is better visually, but usually score is 0-10.
-  // Let's assume 10 is "High Risk" (bad) and 0 is "Low Risk" (good) if inverse?
-  // Or usually scores are "Goodness". Let's assume score is "Goodness" (10 = Low Risk).
-  // If prompt says "Execution Risk", usually 10 means High Risk.
-  // Let's assume standard 0-10 scale where 10 is "High/Strong".
-  // So for Risk, 10 is bad.
+function ScoreRow({ label, data, inverse }) {
+  const score = data?.score || 0;
+  const reason = data?.reason || "";
   
-  const value = inverse ? (10 - score) * 10 : score * 10;
+  // For inverse (Risk), usually 10 means High Risk (bad).
+  // We want the progress bar to reflect "goodness" or just magnitude?
+  // If it's "Execution Risk", 10/10 is scary.
+  // Let's keep it simple: Progress bar fills up to the score.
+  // But maybe color code it? (High risk = red?)
+  // For now, just standard progress.
+  
+  const value = score * 10;
   
   return (
     <div className="space-y-1">
@@ -129,7 +155,8 @@ function ScoreRow({ label, score, inverse }) {
         <span>{label}</span>
         <span>{score}/10</span>
       </div>
-      <Progress value={value} className="h-2" />
+      <Progress value={value} className={`h-2 ${inverse ? "bg-red-100" : ""}`} indicatorClassName={inverse ? "bg-red-500" : ""} />
+      <p className="text-xs text-muted-foreground">{reason}</p>
     </div>
   );
 }

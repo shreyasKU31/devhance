@@ -8,16 +8,25 @@ import { Separator } from "@/components/ui/separator";
 import { ArrowLeft, Code, Layers, Lightbulb, TrendingUp, CheckCircle, Github, AlertTriangle } from "lucide-react";
 import { auth } from "@clerk/nextjs/server";
 import { SignedIn, SignedOut, SignInButton } from "@clerk/nextjs";
+import GenerateReportButton from "@/components/GenerateReportButton";
+import AutoRefresh from "@/components/AutoRefresh";
 
 async function getCaseStudy(slug) {
   const caseStudy = await prisma.caseStudy.findUnique({
     where: { slug },
-    include: { vcReport: true, user: true },
+    include: { 
+      vcReport: true, 
+      user: true, 
+      payments: {
+        orderBy: { createdAt: 'desc' },
+        take: 1
+      }
+    },
   });
   return caseStudy;
 }
 
-export default async function CaseStudyPage({ params }) {
+export default async function CaseStudyPage({ params, searchParams }) {
   const { slug } = await params;
   const caseStudy = await getCaseStudy(slug);
 
@@ -26,9 +35,13 @@ export default async function CaseStudyPage({ params }) {
   }
 
   const { userId } = await auth();
+  const hasVCReport = !!caseStudy.vcReport;
+  const hasPaidPayment = caseStudy.payments?.some(p => p.status === "paid");
+  const paymentSuccess = searchParams?.payment === "success";
 
   return (
     <div className="min-h-screen bg-background pb-12">
+      <AutoRefresh hasReport={hasVCReport} />
       <header className="px-6 h-16 flex items-center border-b border-border/40 sticky top-0 bg-background/95 backdrop-blur z-50">
         <Link href="/" className="flex items-center gap-2 font-bold text-xl text-primary mr-6">
           <TrendingUp className="w-6 h-6" />
@@ -60,7 +73,7 @@ export default async function CaseStudyPage({ params }) {
               </a>
             </div>
             <div>
-              {caseStudy.vcReport ? (
+              {hasVCReport ? (
                 <Link href={`/vc-reports/${caseStudy.vcReport.id}`}>
                   <Button variant="outline" className="border-primary text-primary hover:bg-primary/10">
                     View VC Report
@@ -68,21 +81,29 @@ export default async function CaseStudyPage({ params }) {
                 </Link>
               ) : (
                 <>
-                  <SignedOut>
-                    <SignInButton mode="modal">
-                      <Button className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg shadow-primary/20">
-                        Sign In to Generate Report ($5)
+                  {paymentSuccess || hasPaidPayment ? (
+                    <div className="text-center">
+                      <Button disabled className="bg-primary/50 text-primary-foreground cursor-not-allowed">
+                        Generating Report... (Refresh in 30s)
                       </Button>
-                    </SignInButton>
-                  </SignedOut>
-                  <SignedIn>
-                    <form action="/api/payments/create-checkout" method="POST">
-                      <input type="hidden" name="caseStudyId" value={caseStudy.id} />
-                      <Button type="submit" className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg shadow-primary/20">
-                        Generate VC Report ($5)
-                      </Button>
-                    </form>
-                  </SignedIn>
+                      <p className="text-xs text-muted-foreground mt-2">
+                        Please wait while we generate your report
+                      </p>
+                    </div>
+                  ) : (
+                    <>
+                      <SignedOut>
+                        <SignInButton mode="modal">
+                          <Button className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg shadow-primary/20">
+                            Sign In to Generate Report ($5)
+                          </Button>
+                        </SignInButton>
+                      </SignedOut>
+                      <SignedIn>
+                        <GenerateReportButton caseStudyId={caseStudy.id} />
+                      </SignedIn>
+                    </>
+                  )}
                 </>
               )}
             </div>
