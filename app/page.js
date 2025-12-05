@@ -4,14 +4,14 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowRight, FileText, TrendingUp, Github } from "lucide-react";
 import HeroForm from "@/components/hero-form";
+import Image from "next/image";
 
 export default function Home() {
   return (
     <div className="flex flex-col min-h-screen">
       <header className="px-6 h-16 flex items-center border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
         <div className="flex items-center gap-2 font-bold text-xl text-primary">
-          <TrendingUp className="w-6 h-6" />
-          <span>DevHance</span>
+          <Image src={"/DH Logo.png"} alt="DevHance Logo" width={150} height={150}/>
         </div>
         <nav className="ml-auto flex gap-4 sm:gap-6 items-center">
           <SignedOut>
