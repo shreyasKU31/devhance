@@ -30,20 +30,20 @@ export default function HeroForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3 w-full max-w-lg mx-auto mt-8">
+    <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-4 w-full max-w-2xl mx-auto mt-10">
       <div className="relative flex-1">
-        <Github className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
+        <Github className="absolute top-1/2 left-6 -translate-y-1/2 z-10 h-6 w-6 text-muted-foreground" />
         <Input
-          placeholder="https://github.com/username/repo"
-          className="pl-10 h-12 text-base bg-background/50 backdrop-blur border-primary/20 focus-visible:ring-primary"
+          placeholder="Paste your GitHub repo..."
+          className="pl-16 h-16 w-full text-lg bg-background/50 backdrop-blur border-primary/20 focus-visible:ring-primary rounded-full transition-all hover:border-primary/50"
           value={url}
           onChange={(e) => setUrl(e.target.value)}
           required
         />
       </div>
-      <Button type="submit" size="lg" className="h-12 px-8 font-semibold shadow-lg shadow-primary/20" disabled={loading}>
-        {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Generate"}
-        {!loading && <ArrowRight className="ml-2 w-5 h-5" />}
+      <Button type="submit" size="lg" className="h-16 px-10 text-lg font-bold shadow-lg shadow-primary/20 rounded-full btn-primary-gradient" disabled={loading}>
+        {loading ? <Loader2 className="w-6 h-6 animate-spin" /> : "Generate Case Study"}
+        {!loading && <ArrowRight className="ml-2 w-6 h-6" />}
       </Button>
     </form>
   );
