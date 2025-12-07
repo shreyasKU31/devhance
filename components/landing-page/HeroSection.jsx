@@ -1,18 +1,29 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import HeroForm from "@/components/hero-form";
 import BGGradient from "./bgGradient";
 
 export default function HeroSection() {
+  const prefersReducedMotion = useReducedMotion();
+
+  const animationProps = prefersReducedMotion
+    ? {}
+    : {
+        initial: { opacity: 0, y: 20 },
+        animate: { opacity: 1, y: 0 },
+        transition: { duration: 0.5 },
+      };
+
   return (
-    <section className="w-full min-h-[calc(100vh-4rem)] flex items-center justify-center pb-32 pt-10 bg-background relative overflow-hidden">
+    <section 
+      className="w-full min-h-[calc(100vh-4rem)] flex items-center justify-center pb-32 pt-10 bg-background relative overflow-hidden"
+      aria-label="Hero section"
+    >
       <BGGradient/>
       <div className="container px-4 md:px-6 mx-auto text-center z-10">
         <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
+          {...animationProps}
           className="space-y-8 max-w-5xl mx-auto"
         >
           <h1 className="text-5xl w-full font-black tracking-tight sm:text-6xl md:text-7xl lg:text-8xl uppercase leading-none text-foreground">
@@ -36,3 +47,4 @@ export default function HeroSection() {
     </section>
   );
 }
+

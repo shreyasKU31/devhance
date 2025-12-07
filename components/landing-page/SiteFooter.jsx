@@ -12,7 +12,7 @@ export default function SiteFooter() {
           {/* Column 1: The Identity */}
           <div className="space-y-4">
             <div className="flex items-center gap-2">
-               <Image src={"/DH Logo.png"} alt="DevHance Logo" width={120} height={120} className="opacity-90 hover:opacity-100 transition-opacity"/>
+               <Image src="/DH Logo.png" alt="DevHance Logo" width={120} height={120} loading="lazy" className="opacity-90 hover:opacity-100 transition-opacity"/>
             </div>
             <p className="text-muted-foreground font-medium">
               Turn code into leverage.

@@ -10,6 +10,7 @@ import { auth } from "@clerk/nextjs/server";
 import { SignedIn, SignedOut, SignInButton } from "@clerk/nextjs";
 import GenerateReportButton from "@/components/GenerateReportButton";
 import AutoRefresh from "@/components/AutoRefresh";
+import { CaseStudyJsonLd } from "@/components/JsonLd";
 
 async function getCaseStudy(slug) {
   const caseStudy = await prisma.caseStudy.findUnique({
@@ -24,6 +25,62 @@ async function getCaseStudy(slug) {
     },
   });
   return caseStudy;
+}
+
+// Dynamic SEO metadata for each case study
+export async function generateMetadata({ params }) {
+  const { slug } = await params;
+  const caseStudy = await getCaseStudy(slug);
+
+  if (!caseStudy) {
+    return {
+      title: "Case Study Not Found",
+      description: "The requested case study could not be found.",
+    };
+  }
+
+  const title = `${caseStudy.title} - Case Study`;
+  const description = caseStudy.summary?.slice(0, 160) || 
+    `Technical case study for ${caseStudy.title}. Built with ${caseStudy.techStack}`;
+
+  return {
+    title,
+    description,
+    keywords: [
+      caseStudy.title,
+      ...caseStudy.techStack.split(",").map(t => t.trim()),
+      "case study",
+      "portfolio",
+      "GitHub project",
+    ],
+    openGraph: {
+      title,
+      description,
+      url: `https://devhance.in/case-studies/${slug}`,
+      siteName: "DevHance",
+      type: "article",
+      publishedTime: caseStudy.createdAt?.toISOString(),
+      modifiedTime: caseStudy.updatedAt?.toISOString(),
+      authors: [caseStudy.user?.email || "DevHance User"],
+      images: [
+        {
+          url: "/DH Logo.png",
+          width: 1200,
+          height: 630,
+          alt: caseStudy.title,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: ["/DH Logo.png"],
+    },
+    alternates: {
+      canonical: `https://devhance.in/case-studies/${slug}`,
+    },
+  };
 }
 
 export default async function CaseStudyPage({ params, searchParams }) {
@@ -41,6 +98,7 @@ export default async function CaseStudyPage({ params, searchParams }) {
 
   return (
     <div className="min-h-screen bg-background pb-12">
+      <CaseStudyJsonLd caseStudy={caseStudy} />
       <AutoRefresh hasReport={hasVCReport} />
       <header className="px-6 h-16 flex items-center border-b border-border/40 sticky top-0 bg-background/95 backdrop-blur z-50">
         <Link href="/" className="flex items-center gap-2 font-bold text-xl text-primary mr-6">
