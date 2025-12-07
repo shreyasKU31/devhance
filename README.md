@@ -1,36 +1,193 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+<p align="center">
+  <img src="public/DH Logo.png" alt="DevHance Logo" width="300" />
+</p>
 
-## Getting Started
+<h1 align="center">DevHance</h1>
 
-First, run the development server:
+<p align="center">
+  <strong>Stop Sending Ugly GitHub Links.</strong><br/>
+  Transform your repositories into client-winning case studies and investor-grade technical audits in 30 seconds.
+</p>
+
+<p align="center">
+  <a href="https://devhance.in">Website</a> •
+  <a href="#features">Features</a> •
+  <a href="#quick-start">Quick Start</a> •
+  <a href="#documentation">Docs</a> •
+  <a href="#contributing">Contributing</a>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Next.js-16-black?style=flat-square&logo=next.js" alt="Next.js" />
+  <img src="https://img.shields.io/badge/React-19-61DAFB?style=flat-square&logo=react" alt="React" />
+  <img src="https://img.shields.io/badge/Tailwind-4-38B2AC?style=flat-square&logo=tailwind-css" alt="Tailwind" />
+  <img src="https://img.shields.io/badge/Prisma-6-2D3748?style=flat-square&logo=prisma" alt="Prisma" />
+  <img src="https://img.shields.io/badge/License-MIT-green?style=flat-square" alt="License" />
+</p>
+
+---
+
+## 🚀 What is DevHance?
+
+**DevHance** is an AI-powered SaaS that transforms raw GitHub repositories into professional, shareable assets:
+
+- **📄 Case Studies** — Instantly generate beautiful, deployed case study pages from any public repo
+- **📊 VC Reports** — Get investor-grade technical audits with code quality metrics, architecture analysis, and scalability assessments
+
+Your code is genius. Your presentation is costing you money. **We fix that.**
+
+---
+
+## ✨ Features
+
+| Feature | Description |
+|---------|-------------|
+| **One-Click Generation** | Paste a GitHub URL, get a professional case study in seconds |
+| **AI-Powered Analysis** | Automatic tech stack detection, architecture mapping, and narrative generation |
+| **Investor-Ready Reports** | Technical debt scans, security analysis, and "Buy Box" scoring |
+| **Shareable Links** | Every case study gets a unique, SEO-optimized URL |
+| **PDF Export** | Download reports for proposals and pitch decks |
+
+---
+
+## 🛠️ Tech Stack
+
+| Category | Technologies |
+|----------|-------------|
+| **Framework** | Next.js 16 (App Router), React 19 |
+| **Styling** | Tailwind CSS 4, Radix UI |
+| **Database** | PostgreSQL + Prisma ORM |
+| **Auth** | Clerk |
+| **Payments** | Lemon Squeezy |
+| **AI** | Google Generative AI (Gemini) |
+| **Animations** | Framer Motion |
+
+---
+
+## 🚦 Quick Start
+
+### Prerequisites
+
+- Node.js 18+ 
+- pnpm (recommended) or npm
+- PostgreSQL database
+
+### Installation
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+# Clone the repository
+git clone https://github.com/devhance/devhance.git
+cd devhance
+
+# Install dependencies
+pnpm install
+
+# Set up environment variables
+cp .env.example .env.local
+# Edit .env.local with your credentials
+
+# Set up the database
+pnpm prisma generate
+pnpm prisma db push
+
+# Start development server
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) to see the app.
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## ⚙️ Environment Variables
 
-## Learn More
+Create a `.env.local` file with the following:
 
-To learn more about Next.js, take a look at the following resources:
+```env
+# Database
+DATABASE_URL="postgresql://..."
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# Clerk Authentication
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY="pk_..."
+CLERK_SECRET_KEY="sk_..."
+CLERK_WEBHOOK_SECRET="whsec_..."
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+# Lemon Squeezy Payments
+LEMONSQUEEZY_API_KEY="..."
+LEMONSQUEEZY_STORE_ID="..."
+LEMONSQUEEZY_WEBHOOK_SECRET="..."
+NEXT_PUBLIC_LEMONSQUEEZY_VARIANT_ID="..."
 
-## Deploy on Vercel
+# Google AI
+GOOGLE_AI_API_KEY="..."
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+# Analytics
+NEXT_PUBLIC_GA_MEASUREMENT_ID="G-..."
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+See [`.env.example`](.env.example) for full documentation.
+
+---
+
+## 📁 Project Structure
+
+```
+devhance/
+├── app/                    # Next.js App Router pages & API routes
+│   ├── api/               # API endpoints
+│   ├── case-studies/      # Case study pages
+│   ├── dashboard/         # User dashboard
+│   └── vc-reports/        # VC report pages
+├── components/            # React components
+│   ├── landing-page/      # Homepage sections
+│   └── ui/                # Reusable UI components
+├── lib/                   # Utility functions & services
+│   ├── ai.js              # AI generation logic
+│   ├── github.js          # GitHub API integration
+│   └── prisma.js          # Database client
+├── prisma/                # Database schema
+├── public/                # Static assets
+└── docs/                  # Documentation
+```
+
+---
+
+## 📖 Documentation
+
+| Document | Description |
+|----------|-------------|
+| [Architecture](docs/ARCHITECTURE.md) | System design and component overview |
+| [API Reference](docs/API.md) | API endpoints documentation |
+| [Deployment](docs/DEPLOYMENT.md) | Production deployment guide |
+
+---
+
+## 🤝 Contributing
+
+We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
+
+---
+
+## 🔗 Links
+
+- **Website**: [devhance.in](https://devhance.in)
+- **Support**: [shreyas@devhance.in](mailto:shreyas@devhance.in)
+- **Twitter**: [@devhance](https://twitter.com/devhance)
+
+---
+
+<p align="center">
+  <strong>Built for High-Signal Developers</strong><br/>
+  <sub>Made with ❤️ by the DevHance team</sub>
+</p>

@@ -59,7 +59,7 @@ export default function SiteFooter() {
                 </Link>
               </li>
               <li>
-                <a href="mailto:founder@devhance.in" className="text-muted-foreground hover:text-primary transition-colors">
+                <a href="mailto:shreyas@devhance.in" className="text-muted-foreground hover:text-primary transition-colors">
                   Support
                 </a>
               </li>

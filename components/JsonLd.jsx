@@ -66,7 +66,7 @@ export function OrganizationJsonLd() {
     ],
     contactPoint: {
       '@type': 'ContactPoint',
-      email: 'founder@devhance.in',
+      email: 'shreyas@devhance.in',
       contactType: 'customer service',
     },
   };
