@@ -46,7 +46,6 @@ Your code is genius. Your presentation is costing you money. **We fix that.**
 | **AI-Powered Analysis** | Automatic tech stack detection, architecture mapping, and narrative generation |
 | **Investor-Ready Reports** | Technical debt scans, security analysis, and "Buy Box" scoring |
 | **Shareable Links** | Every case study gets a unique, SEO-optimized URL |
-| **PDF Export** | Download reports for proposals and pitch decks |
 
 ---
 
