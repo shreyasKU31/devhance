@@ -69,6 +69,19 @@ When contributing to DevHance, please follow these security best practices:
 - Review security advisories regularly
 - Run `pnpm audit` periodically
 
+### Bot Protection
+
+- Automated clients and bots are blocked via middleware
+- **Allowed**: Search engine bots (Googlebot, Bingbot, DuckDuckBot, etc.)
+- **Blocked**: Scrapers, curl, wget, python-requests, Postman, and other automated tools
+- Bot detection is based on User-Agent analysis
+
+### Rate Limiting
+
+- All requests are rate-limited to **100 requests per minute per IP**
+- Exceeding the limit returns `429 Too Many Requests`
+- Rate limiting uses in-memory storage (per server instance)
+
 ## Bug Bounty
 
 While we don't currently have a formal bug bounty program, we deeply appreciate security researchers who responsibly disclose vulnerabilities. Contributors who report valid security issues will be:
