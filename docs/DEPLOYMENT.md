@@ -18,7 +18,7 @@ Before deploying, ensure you have:
 
 - [ ] GitHub repository with DevHance code
 - [ ] Vercel account (or alternative hosting)
-- [ ] PostgreSQL database (Supabase, Neon, Railway, etc.)
+- [ ] MongoDB database (MongoDB Atlas, etc.)
 - [ ] Clerk account for authentication
 - [ ] Lemon Squeezy account for payments
 - [ ] Google AI API key
@@ -60,7 +60,7 @@ Click **Deploy** and wait for the build to complete.
 
 ```env
 # Database
-DATABASE_URL="postgresql://user:password@host:5432/dbname?sslmode=require"
+DATABASE_URL="mongodb+srv://user:password@cluster.mongodb.net/dbname?retryWrites=true&w=majority"
 
 # Clerk Authentication
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY="pk_live_..."

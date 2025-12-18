@@ -28,7 +28,7 @@ This project and everyone participating in it is governed by our [Code of Conduc
 
 - Node.js 18+
 - pnpm (recommended)
-- PostgreSQL database
+- MongoDB database
 - Git
 
 ### Local Development Setup

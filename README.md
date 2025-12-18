@@ -56,11 +56,24 @@ Your code is genius. Your presentation is costing you money. **We fix that.**
 |----------|-------------|
 | **Framework** | Next.js 16 (App Router), React 19 |
 | **Styling** | Tailwind CSS 4, Radix UI |
-| **Database** | PostgreSQL + Prisma ORM |
+| **Database** | MongoDB + Prisma ORM |
 | **Auth** | Clerk |
 | **Payments** | Lemon Squeezy |
 | **AI** | Google Generative AI (Gemini) |
 | **Animations** | Framer Motion |
+
+---
+
+## 🔒 Security & Production Features
+
+| Feature | Description |
+|---------|-------------|
+| **Rate Limiting** | 100 requests/min per IP to prevent abuse |
+| **Bot Protection** | Blocks scrapers & automated tools (allows search engines) |
+| **CSP Headers** | Content Security Policy for XSS prevention |
+| **Structured Errors** | Consistent API error responses with error codes |
+| **Environment Validation** | Fails fast if required env vars are missing |
+| **Duplicate Prevention** | Prevents generating duplicate case studies for same repo |
 
 ---
 
@@ -70,7 +83,7 @@ Your code is genius. Your presentation is costing you money. **We fix that.**
 
 - Node.js 18+ 
 - pnpm (recommended) or npm
-- PostgreSQL database
+- MongoDB database
 
 ### Installation
 
@@ -104,7 +117,7 @@ Create a `.env.local` file with the following:
 
 ```env
 # Database
-DATABASE_URL="postgresql://..."
+DATABASE_URL="mongodb+srv://..."
 
 # Clerk Authentication
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY="pk_..."
@@ -142,8 +155,11 @@ devhance/
 │   └── ui/                # Reusable UI components
 ├── lib/                   # Utility functions & services
 │   ├── ai.js              # AI generation logic
+│   ├── errors.js          # Custom error classes
+│   ├── env.js             # Environment validation
 │   ├── github.js          # GitHub API integration
-│   └── prisma.js          # Database client
+│   ├── prisma.js          # Database client
+│   └── security.js        # Rate limiting & bot protection
 ├── prisma/                # Database schema
 ├── public/                # Static assets
 └── docs/                  # Documentation

@@ -82,6 +82,24 @@ When contributing to DevHance, please follow these security best practices:
 - Exceeding the limit returns `429 Too Many Requests`
 - Rate limiting uses in-memory storage (per server instance)
 
+### Error Handling
+
+- All API routes use structured error classes (`lib/errors.js`)
+- Consistent error response format: `{ error: string, code: string }`
+- Error codes: `VALIDATION_ERROR`, `AUTH_ERROR`, `NOT_FOUND`, `RATE_LIMIT`, `DUPLICATE_REPO`
+
+### Environment Validation
+
+- Required environment variables are validated at startup (`lib/env.js`)
+- Missing required vars cause immediate failure with clear error messages
+- Optional vars trigger warnings in development mode
+
+### Content Security Policy
+
+- CSP headers configured in `next.config.mjs`
+- Restricts script sources, frame ancestors, and connect sources
+- Allows required third-party services (Clerk, Lemon Squeezy, GitHub API)
+
 ## Bug Bounty
 
 While we don't currently have a formal bug bounty program, we deeply appreciate security researchers who responsibly disclose vulnerabilities. Contributors who report valid security issues will be:

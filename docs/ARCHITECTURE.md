@@ -40,7 +40,7 @@ DevHance is a Next.js 16 application that transforms GitHub repositories into pr
                          │               │
                          ▼               ▼
                    ┌──────────┐    ┌──────────────┐
-                   │PostgreSQL│    │ GitHub API   │
+                   │ MongoDB  │    │ GitHub API   │
                    │ Database │    │ Google AI    │
                    └──────────┘    │ LemonSqueezy │
                                    └──────────────┘
@@ -201,7 +201,7 @@ model Payment {
 | Service | Purpose | Environment Variables |
 |---------|---------|----------------------|
 | **Clerk** | Authentication | `CLERK_SECRET_KEY`, `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` |
-| **PostgreSQL** | Database | `DATABASE_URL` |
+| **MongoDB** | Database | `DATABASE_URL` |
 | **Google AI** | Content generation | `GOOGLE_AI_API_KEY` |
 | **Lemon Squeezy** | Payments | `LEMONSQUEEZY_API_KEY`, `LEMONSQUEEZY_WEBHOOK_SECRET` |
 | **GitHub API** | Repository data | Public API (no key needed for public repos) |

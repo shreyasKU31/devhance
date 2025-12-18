@@ -25,6 +25,24 @@ export async function POST(req) {
       throw new ValidationError("Please provide a valid GitHub repository URL", "repoUrl");
     }
 
+    // Normalize repoUrl (remove trailing slashes, .git suffix)
+    const normalizedUrl = repoUrl.replace(/\.git$/, '').replace(/\/$/, '');
+
+    // Check if case study already exists for this repo
+    const existingCaseStudy = await prisma.caseStudy.findFirst({
+      where: { repoUrl: normalizedUrl },
+      select: { slug: true, title: true }
+    });
+
+    if (existingCaseStudy) {
+      return NextResponse.json({
+        error: "A case study for this repository already exists",
+        code: "DUPLICATE_REPO",
+        existingSlug: existingCaseStudy.slug,
+        existingTitle: existingCaseStudy.title
+      }, { status: 409 });
+    }
+
     // Ensure User exists in DB (Sync on demand if webhook failed)
     const email = user.emailAddresses[0]?.emailAddress || "no-email@example.com";
     const dbUser = await prisma.user.upsert({
@@ -37,7 +55,7 @@ export async function POST(req) {
     });
 
     // 1. Generate AI Content (includes Repomix & Gemini)
-    const { metadata, ...content } = await generateCaseStudyContent(repoUrl, userId);
+    const { metadata, ...content } = await generateCaseStudyContent(normalizedUrl, userId);
 
     // 2. Create Slug
     const repoName = repoUrl.split("/").pop() || "project";
@@ -47,7 +65,7 @@ export async function POST(req) {
     // 3. Save to DB
     const caseStudy = await prisma.caseStudy.create({
       data: {
-        repoUrl,
+        repoUrl: normalizedUrl,
         title: content.title,
         summary: content.summary,
         problemSummary: content.problemSummary,
