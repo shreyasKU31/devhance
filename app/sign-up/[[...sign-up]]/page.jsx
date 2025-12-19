@@ -1,4 +1,3 @@
-```javascript
 import { SignUp } from "@clerk/nextjs";
 import Link from "next/link";
 import Image from "next/image";
@@ -13,4 +12,3 @@ export default function SignUpPage() {
     </div>
   );
 }
-```
