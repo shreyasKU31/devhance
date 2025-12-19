@@ -83,8 +83,11 @@ export async function generateMetadata({ params }) {
   };
 }
 
-export default async function CaseStudyPage({ params, searchParams }) {
-  const { slug } = await params;
+export default async function CaseStudyPage(props) {
+  const params = await props.params;
+  const searchParams = await props.searchParams;
+  const { slug } = params;
+  const paymentStatus = searchParams.payment;
   const caseStudy = await getCaseStudy(slug);
 
   if (!caseStudy) {
