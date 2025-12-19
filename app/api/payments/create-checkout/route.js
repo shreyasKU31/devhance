@@ -110,7 +110,26 @@ export async function POST(req) {
       );
     }
 
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+    // Determine App URL
+    // Prioritize environment variable, then request origin, then localhost fallback
+    let appUrl = process.env.NEXT_PUBLIC_APP_URL;
+    
+    if (!appUrl) {
+      const origin = req.headers.get("origin");
+      const host = req.headers.get("host");
+      const protocol = req.headers.get("x-forwarded-proto") || "http";
+      
+      if (origin) {
+        appUrl = origin;
+      } else if (host) {
+        appUrl = `${protocol}://${host}`;
+      } else {
+        appUrl = "http://localhost:3000";
+      }
+    }
+    
+    // Remove trailing slash if present
+    appUrl = appUrl.replace(/\/$/, "");
     const successUrl = `${appUrl}/case-studies/${caseStudy.slug}?payment=success`;
 
     console.log("Creating checkout for:", {

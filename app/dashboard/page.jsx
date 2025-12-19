@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { redirect } from "next/navigation";
 import { auth } from "@clerk/nextjs/server";
 import prisma from "@/lib/prisma";
@@ -35,9 +36,15 @@ export default async function DashboardPage() {
     <div className="min-h-screen bg-background p-6">
       <div className="max-w-5xl mx-auto space-y-8">
         <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+          <div className="flex items-center gap-4">
+             <Link href="/">
+               <Image src="/DH Logo.png" alt="DevHance" width={120} height={40} className="object-contain" />
+             </Link>
+             <span className="text-muted-foreground text-2xl font-light">|</span>
+             <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+          </div>
           <Link href="/case-studies/new">
-            <Button>
+            <Button className="btn-primary-gradient font-bold shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all">
               <Plus className="mr-2 h-4 w-4" />
               New Case Study
             </Button>

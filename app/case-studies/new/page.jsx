@@ -31,6 +31,18 @@ export default function NewCaseStudyPage() {
 
       if (!res.ok) {
         const errorData = await res.json();
+        
+        // Handle 429 (Already analyzing) specifically
+        if (res.status === 429) {
+          toast.warning("Analysis in Progress", {
+            description: errorData.error || "You already have an active anlysis running.",
+            duration: 5000,
+          });
+          // Redirect to dashboard after a short delay
+          setTimeout(() => router.push("/dashboard"), 3000);
+          return;
+        }
+
         throw new Error(errorData.error || "Failed to generate case study");
       }
 
@@ -40,8 +52,10 @@ export default function NewCaseStudyPage() {
       router.push(`/case-studies/${data.slug}`);
     } catch (error) {
       console.error(error);
-      toast.error(error.message || "Something went wrong. Please try again.");
-      // On error, redirect to home after a delay so user sees the toast
+      toast.error("Error", {
+        description: error.message || "Something went wrong. Please try again.",
+      });
+      // On generic error, redirect to home after a delay so user sees the toast
       setTimeout(() => router.push("/"), 2000);
     }
   };

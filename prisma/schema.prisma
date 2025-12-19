@@ -89,3 +89,11 @@ model Payment {
   createdAt                DateTime @default(now())
   updatedAt                DateTime @updatedAt
 }
+
+model AnalysisStatus {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @unique
+  repoUrl   String
+  status    String   @default("processing")
+  createdAt DateTime @default(now())
+}

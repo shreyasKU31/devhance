@@ -1,3 +1,5 @@
+import Link from "next/link";
+import Image from "next/image";
 import { notFound, redirect } from "next/navigation";
 import { auth } from "@clerk/nextjs/server";
 import prisma from "@/lib/prisma";
@@ -5,7 +7,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { AlertTriangle, CheckCircle, TrendingUp, Shield, Target } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { AlertTriangle, CheckCircle, TrendingUp, Shield, Target, ArrowLeft, Lightbulb } from "lucide-react";
 
 async function getVCReport(id, userId) {
   const report = await prisma.vCReport.findUnique({
@@ -62,9 +65,8 @@ export default async function VCReportPage({ params }) {
   return (
     <div className="min-h-screen bg-background pb-12">
       <header className="px-6 h-16 flex items-center border-b border-border/40 sticky top-0 bg-background/95 backdrop-blur z-50">
-        <Link href="/" className="flex items-center gap-2 font-bold text-xl text-primary mr-6">
-          <TrendingUp className="w-6 h-6" />
-          <span>DevHance</span>
+        <Link href="/" className="mr-6">
+          <Image src="/DH Logo.png" alt="DevHance" width={140} height={40} className="object-contain" priority />
         </Link>
         <Link href={`/case-studies/${report.caseStudy.slug}`}>
           <Button variant="ghost" size="sm">

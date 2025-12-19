@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import prisma from "@/lib/prisma";
 import { Button } from "@/components/ui/button";
@@ -104,9 +105,8 @@ export default async function CaseStudyPage(props) {
       <CaseStudyJsonLd caseStudy={caseStudy} />
       <AutoRefresh hasReport={hasVCReport} />
       <header className="px-6 h-16 flex items-center border-b border-border/40 sticky top-0 bg-background/95 backdrop-blur z-50">
-        <Link href="/" className="flex items-center gap-2 font-bold text-xl text-primary mr-6">
-          <TrendingUp className="w-6 h-6" />
-          <span>DevHance</span>
+        <Link href="/" className="mr-6">
+          <Image src="/DH Logo.png" alt="DevHance" width={140} height={40} className="object-contain" priority />
         </Link>
         <Link href="/dashboard">
           <Button variant="ghost" size="sm">
