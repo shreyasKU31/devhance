@@ -1,10 +1,14 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { FileQuestion, Home } from "lucide-react";
 
 export default function NotFound() {
   return (
     <div className="flex flex-col items-center justify-center min-h-[calc(100vh-4rem)] bg-background p-4 text-center">
+      <Link href="/" className="mb-8">
+         <Image src="/DH Logo.png" alt="DevHance" width={150} height={40} className="object-contain" />
+      </Link>
       <div className="space-y-6 max-w-md animate-in fade-in slide-in-from-bottom-4 duration-500">
         <div className="flex justify-center">
           <div className="p-4 bg-muted rounded-full relative">

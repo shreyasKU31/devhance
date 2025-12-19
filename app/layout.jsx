@@ -48,6 +48,12 @@ export const metadata = {
   "Next.js developer portfolio SaaS",
   "AI analysis for coding projects"
 ],
+  icons: {
+    icon: "/DH Logo.png",
+    shortcut: "/DH Logo.png",
+    apple: "/DH Logo.png",
+  },
+  manifest: "/manifest.json",
   authors: [{ name: "DevHance" }],
   creator: "DevHance",
   publisher: "DevHance",
@@ -112,9 +118,6 @@ export default function RootLayout({ children }) {
         <head>
           <link rel="preconnect" href="https://fonts.googleapis.com" />
           <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-          <link rel="manifest" href="/manifest.json" />
-          <link rel="icon" href="/favicon.ico" sizes="any" />
-          <link rel="apple-touch-icon" href="/DH Logo.png" />
           <WebsiteJsonLd />
           <SoftwareApplicationJsonLd />
           <OrganizationJsonLd />
